@@ -7,15 +7,7 @@ using UnityEngine;
 public class CubeEditor : MonoBehaviour {
 
     [Range(1f, 20f)][SerializeField] float gridSize = 10;
-
-
     TextMesh textMesh;
-
-    private void Start()
-    {
-        
-    }
-
 
     void Update () {
    
@@ -27,8 +19,9 @@ public class CubeEditor : MonoBehaviour {
 
 
         textMesh = GetComponentInChildren<TextMesh>();
-        textMesh.text = snapPos.x / gridSize + "," + snapPos.z / gridSize;
+        string labelText = snapPos.x / gridSize + "," + snapPos.z / gridSize;
+        textMesh.text = labelText;
 
-        
+        gameObject.name = labelText;
     }
 }
