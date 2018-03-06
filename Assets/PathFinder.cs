@@ -10,8 +10,10 @@ public class PathFinder : MonoBehaviour {
     Dictionary<Vector2Int, WayPoint> grid = new Dictionary<Vector2Int, WayPoint>();
 
     Queue<WayPoint> queue = new Queue<WayPoint>();
-    bool queueIsRunning = true;  //todo make private
-    WayPoint searchCenter;  // current searchCenter
+    bool queueIsRunning = true;  
+    WayPoint searchCenter;
+    List<WayPoint> path = new List<WayPoint>(); 
+
 
     Vector2Int[] directions = {
         Vector2Int.up,
@@ -20,16 +22,37 @@ public class PathFinder : MonoBehaviour {
         Vector2Int.left
     };
 
-	// Use this for initialization
-	void Start ()
+    public List<WayPoint> GetPath()
     {
         LoadBlocks();
         ColorStartAndEnd();
-        PathFind();
-        //ExploreNeighbours();
+        BreadthFirstSearch();
+        CreatePath();
+
+        return path;
     }
 
-    private void PathFind()
+    private void CreatePath()
+    {
+        path.Add(endWayPoint);
+
+        WayPoint previous = endWayPoint.exploredFrom;
+
+        while (previous != startWayPoint)
+        {
+            // add intermediate waypoints
+            path.Add(previous);
+            previous = previous.exploredFrom;
+        }
+
+        // add start waypoint
+        path.Add(startWayPoint);
+        // reverse the list
+        path.Reverse();
+
+    }
+
+    private void BreadthFirstSearch()
     {
         queue.Enqueue(startWayPoint);
 
@@ -40,8 +63,6 @@ public class PathFinder : MonoBehaviour {
             ExploreNeighbours();
             searchCenter.isExplored = true;
         }
-        // todo work out path
-        print("Finished pathfinding?");
     }
 
     private void HaltIfEndFound()
@@ -60,15 +81,10 @@ public class PathFinder : MonoBehaviour {
         foreach (Vector2Int direction in directions)
         {
             Vector2Int neighbourCoordinates = searchCenter.GetGridPos() + direction;
-            try
+            if (grid.ContainsKey(neighbourCoordinates))
             {
                 QueueNewNeigbours(neighbourCoordinates);
-            }
-            catch
-            {
-                // do nothing  
-            }
-            
+            }          
         }
     }
 
@@ -89,6 +105,7 @@ public class PathFinder : MonoBehaviour {
 
     private void ColorStartAndEnd()
     {
+        // todo consider moving it
         startWayPoint.SetTopColor(Color.green);
         endWayPoint.SetTopColor(Color.red);
     }
